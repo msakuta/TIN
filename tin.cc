@@ -10,9 +10,9 @@
 
 
 #include <fcntl.h>
-#include <fstream.h>
+#include <fstream>
 #include <iomanip>
-#include <iostream.h>
+#include <iostream>
 #include <malloc.h>
 #include <math.h>
 #include <stdio.h>
@@ -24,6 +24,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
+using namespace std;
 
 
 /* SUBS FUNCTION DECLARATIONS */
@@ -636,7 +637,7 @@ alloc_array(int n, char *msg)
    int     i, n2;
 
    n2 = (int) n *(int) n;
-   p = new(short int *)[n];
+   p = new short int *[n];
    if (p == 0)
      {
 	perror(msg);
@@ -667,7 +668,7 @@ alloc_float_array(int n, char *msg)
    int     i, n2;
 
    n2 = (int) n *(int) n;
-   p = new(float *)[n];
+   p = new float *[n];
    if (p == 0)
      {
 	perror(msg);
@@ -991,7 +992,7 @@ void Init_Vars()
 
    if (0==(points=new Point[tinn2])) 
 	perror2("Allocating points array in Init_Vars.");
-   if (0==(triangles=new(Triangle)[max_allowable_num_triangles])) 
+   if (0==(triangles=new Triangle[max_allowable_num_triangles])) 
 	perror2("Allocating triangles array in Init_Vars.");
 
    Alloc_Dotpairs(tinn2);
