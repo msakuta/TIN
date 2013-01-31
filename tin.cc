@@ -415,7 +415,7 @@ void    Print_Stats();
 void    Print_Time(char *msg), Print_Time2(char *msg);
 void    Print_Triangle(int);
 void    Proc_Swapq();
-void    Read_Data();
+void    Read_Data(const char *fname);
 void    Update_Adjacency(int, int);
 void    Write_Edges(const char * const);
 void    Write_Pgm();
@@ -874,7 +874,7 @@ write2(int fout, char *buf, int nchar, char *msg)
 
 // MAIN  
 
-main()
+main(int argc, const char *argv[])
 {
   char split_label[100];
   char filename[100];
@@ -889,7 +889,8 @@ main()
    
    Get_Options();
    Init_Vars();
-   Read_Data();
+   cout << "fname: " << argv[1] << endl;
+   Read_Data(argv[1]);
    Read_Delta_Time2();
    Make_First_2_Triangles();
    errs->pop();			// Get worst triangle.
@@ -1034,7 +1035,7 @@ void Alloc_Dotpairs(const int n)
 */
 
 void
-Read_Data()
+Read_Data(const char *fname)
 {
    int     i, j;
    short int zmin, zmax;
@@ -1044,14 +1045,22 @@ Read_Data()
 
    // Copy The Heights Data To The Points Array. 
 
+   ifstream ifs(fname, ifstream::binary);
+
    npoints = 0;
-   for (i = 0; i < tinn; i++)
+   for (i = 0; i < tinn; i++){
       for (j = 0; j < tinn; j++)
 	{
 	   points[npoints].x = i;
 	   points[npoints].y = j;
-	   cin >> points[npoints].z;
-	if (! cin.good())
+	   char raw[2];
+	   ifs.read(raw, 2);
+	   printf("%02X %02X ", (unsigned char)raw[0], (unsigned char)raw[1]);
+	   ifs.read(raw, 2);
+	   printf("%02X %02X ", (unsigned char)raw[0], (unsigned char)raw[1]);
+	   points[npoints].z = ((unsigned char)raw[0] | ((unsigned char)raw[1] << 8)) >> 2;
+//	   cin >> points[npoints].z;
+	if (! ifs.good())
 	{
 	printf("At npoints=%d\n",npoints);
 	perror2("Reading cin is not good.");
@@ -1061,6 +1070,12 @@ Read_Data()
 	   zmax = max(zmax, points[npoints].z);
 	   npoints++;
 	}
+      for (j = 0; j < tinn * 2; j++){
+	   char raw[2];
+	   ifs.read(raw, 2);
+	   printf("%02X %02X ", (unsigned char)raw[0], (unsigned char)raw[1]);
+	}
+}
    cout << "tinn=" << tinn << ", Z's range is [" << zmin << "," << zmax << "]\n";
 
    Print_Time("Read_Data");
@@ -1530,12 +1545,12 @@ void Write_Triangles(const char *const filename)
       for (j=0; j<3; j++)
 	{
 	  a = triangles[itr].vert[j];
-	  to << setw(5) << points[a].x << setw(5) << points[a].y 
-	     << setw(5) << points[a].z << endl;
+	  to << setw(10) << points[a].x << setw(10) << points[a].y 
+	     << setw(10) << points[a].z << endl;
 	}	  
       a = triangles[itr].vert[0];
-      to << setw(5) << points[a].x << setw(5) << points[a].y 
-	 << setw(5) << points[a].z << endl << endl;
+      to << setw(10) << points[a].x << setw(10) << points[a].y 
+	 << setw(10) << points[a].z << endl << endl;
     }
 }
 
