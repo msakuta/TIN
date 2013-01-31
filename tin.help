@@ -1,0 +1,59 @@
+TIN:
+
+   This calculates a triangulated irregular network (TIN) approximation for a
+   square grid of input elevations.
+
+   INPUT:
+
+   1) envar TINN, defining nrows, the numbers of rows and columns in the data.
+   2) envar TPRINT, 0 or 1, giving amount of routine printing.
+   3) envar TSPLITS, Max number of splits before stopping and printing edge 
+      list and pgm file.
+   4) envar TINCRFILES: whether to write edge and triangle files periodically.  
+	If so, write them every so many splits.
+   5) envar TSWAP: when to swap diagonals:
+	0: never
+	1: Delauney.
+	2. min weight (edge length)
+	3. minmax deviation. (not implemented yet)
+   6) stream cin, containing nrows*nrows of ascii elevations,
+      which are converted to short int.
+
+   OUTPUT: 
+
+   1) stream cout: a log of the operations.
+   2) t.pgm: Image of the result triangles, with random coloring.
+   3) edges.all: the resulting 3-D edges.
+   4) triangles.all: the resulting triangles.
+   5) stats: A stats file 'stats' printed as tin runs. 
+   6) edges.1024,..., triangles.1024,... incremental versions of
+      edges and triangles, written if TINCRFILES=1   
+
+   edges.all, triangles.all, and stats are self-documenting.
+
+                     ========================
+        MOST BUSINESS:
+Prof. WR Franklin 
+ECSE Dept., 6026 JEC,
+Rensselaer Polytechnic Inst,
+Troy NY, 12180 USA
+
+wrf@ecse.rpi.edu (PGP avail.)
++1 (518) 276-6077
+RPI Fax: +1 (518) 276-6261
+
+http://www.ecse.rpi.edu/Homepages/wrf/
+                     ========================
+
+ NSF BUSINESS ONLY:
+WR Franklin, Program Director,
+National Science Foundation,
+CISE/C-CR,                   
+4201 Wilson Blvd, Room 1145S,
+Arlington VA 22230           
+                             
+wfrankli@nsf.gov             
++1 (703) 292-8912
+Fax: +1 (703) 292-9059
+                     ========================
+

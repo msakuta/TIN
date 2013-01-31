@@ -1,0 +1,7 @@
+#! /usr/bin/zsh
+
+# Run tin on test file, w/o using compression.
+
+time TINN=1201 TPRINT=0 TSPLITS=1000000 TINCRFILES=0 TSWAP=1  \
+./tin < adirondacks.elevs >! adirondacks.log
+

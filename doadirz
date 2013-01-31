@@ -1,0 +1,33 @@
+#! /usr/bin/zsh
+# Time-stamp: </wrf/c/tin/Dist/doadirz, Tue, 30 Oct 2001, 15:05:57 EST, wrf@benvolio.ecse.rpi.edu>
+
+# Run tin on test data, using compressed files However, if tin writes
+# incremental edges and triangles files, then this doesn't compress
+# them.
+
+# Warning the compressed output files are still almost 80MB.
+
+# If envars TINN etc are set, then use those values.  Else use defaults.
+
+mkfifo stats
+gzip < stats > stats.gz &
+
+mkfifo centers.all
+gzip < centers.all > centers.all.gz &
+
+mkfifo edges.all
+gzip < edges.all > edges.all.gz &
+
+mkfifo triangles.all
+gzip < triangles.all > triangles.all.gz &
+
+gunzip < adirondacks.elevs.gz | \
+time TINN=${TINN:-1201} \
+TPRINT=${TPRINT:-0} \
+TSPLITS=${TSPLITS:-1000000} \
+TINCRFILES=${TINCRFILES:-0} \
+TSWAP=${TSWAP:-1}  \
+./tin  >>! adirondacks.log
+
+rm stats centers.all edges.all triangles.all
+

@@ -1,0 +1,161 @@
+Time-stamp: </wrf/c/tin/Dist/README, Thu,  1 Nov 2001, 17:47:10 EST, wrf@benvolio.ecse.rpi.edu>
+
+* Author
+
+Prof. WR Franklin 
+ECSE Dept., 6026 JEC,
+Rensselaer Polytechnic Inst,
+Troy NY, 12180 USA
+
+wrf@ecse.rpi.edu (PGP avail.)
+
+http://www.ecse.rpi.edu/Homepages/wrf/
+
+
+* Intro
+
+TIN is a program to create a Triangulated Irregular Network (TIN)
+from an array of elevations representing an approximation to a
+surface.  The TIN is an approximation to the original surface,
+which may use less space that the original data.
+
+TIN handles very large datasets very quickly.  For example, the
+level 1 USGS DEM input file Lake Champlain W, which is 1201x1201
+points, on a 600MHz Pentium with 192MB running linux, tinning the
+dataset until the error is 0 requires about 160 CPU seconds.
+
+TIN does not require, in a deep way, that the points be in a grid,
+however that simplifies internal data structures.  Indeed, the
+points being in a grid causes various degenerate cases, which now
+must be handled.  One example is a triangle whose three vertices
+are collinear.
+
+The development environment is g++ and zsh in linux, since this
+makes me most productive.
+
+TIN is able to process large datasets because careful
+consideration was given to the using the simplest possible data
+structure.  E.g, the only explicit data structure is the triangle;
+the edge is not an explicit separate data structure.
+
+
+* Method
+
+1. Split the square grid of points into 2 triangles.
+
+2. For each point, determine which triangle contains it, and the
+vertical error of that point from the triangle plane.
+
+3. Repeat 
+
+   a. Find the point with largest error.
+
+   b. Split its triangle into 2 or 3 new triangles at that point.
+   (If the point is on a boundary of the original square, then
+   there will be 2 new triangles.  Otherwise, including when the
+   point is on an internal edge, there will be 3, one of which is
+   degenerate.)
+
+   c. Allocate the former triangle's points among the 3 new
+   triangles, and calculate the points' new errors.
+
+   d. Each new triangle will have 1 to 3 adjacent old triangles.
+   Add them to a list of possible swaps.
+
+   e. Repeat until the possible swap list is empty.
+
+      i. Consider the common edge between the new triangle and the
+      adjacent triangle on the list.
+
+      ii.  Under certain conditions, such as to maintain a
+      Delauney triangulation, swap the edge, destroy the two
+      triangles, and create 2 new ones.
+
+      Note that a couple of experimental swapping rules are being
+      tested, since it's not clear to me why Delauney should be
+      better than another method.
+
+      If one of the two triangles is degenerate, then always swap.
+      This will remove the degeneracy.
+
+      iii. If the diagonal is swapped, then add the new adjacent
+      triangles to the possible swap list.
+
+   f. Stop when: the max error is zero, all points have been
+   included, or the target number of triangles have been created.
+
+
+* Legal
+
+You are welcome to use and modify this program for nonprofit
+research or teaching purposes provided that I am given credit for
+the original program, and that the results are publicly available.
+This program is copyrighted and is not in the public domain.
+
+
+* Usage
+
+See file tin.help
+
+
+* Motivation for some design decisions
+
+** Why use ASCII instead of binary for the input data?  
+
+It avoids the endian problem when interchanging data bertween Suns
+and Pentiums.  It's human readable, and more easily processable,
+e.g., in Emacs.  A compressed ASCII file is not much larger that
+the compressed equivalent binary file.
+
+** What motivates the output data file format?
+
+gnuplot reads it easily.   E.g., gnuplot ignores lines starting
+with '#'.
+
+Do this in gnuplot to plot the edges:
+
+			plot "edges.all" with lines
+
+Do this before plotting the edges also to show the centers:
+
+			load "centers.all"
+
+** What if I want more general input?
+
+Modify routines read_data and Make_First_2_Triangles.
+
+** Why is the order of components in tin.cc somewhat chaotic?
+
+To simplify distribution, I combined 5 header or source files into
+one file.
+
+* Source Files
+
+README		This file.
+Makefile	Compile, package, tin.
+tin.cc		The source file.
+tin.help	Help file
+doadir		Run the sample case
+doadirz		Run the sample case, reading and writing
+		compressed files.
+adirondacks.elevs.gz  Sample dataset.
+
+* Misc
+
+** Uncompressing and compressing the i/o files takes several times
+as much cpu as tinning.
+
+** Note how I can capture the output to a named file and compress
+it:
+
+	mkfifo stats
+	gzip < stats > stats.gz &
+
+That is, tin things that it is writing to file stats; it needn't
+be modified.   
+
+* Emacs stuff:
+
+Local Variables:
+eval: (progn (outline-minor-mode) (font-lock-mode 0) (hide-lower-levels) )
+End:
